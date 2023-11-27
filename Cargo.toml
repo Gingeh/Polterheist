@@ -1,0 +1,15 @@
+[package]
+name = "jam_game" # Placeholder name
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.12"
+bevy_asset_loader = { version = "0.18" }
+bevy-inspector-egui = { version = "0.21", optional = true }
+
+[features]
+inspect = ["dep:bevy-inspector-egui"]
+
+[lints.clippy]
+type_complexity = "allow"
