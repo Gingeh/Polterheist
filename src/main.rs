@@ -3,6 +3,7 @@ use bevy::window::WindowResolution;
 
 use bevy_asset_loader::prelude::*;
 
+mod game;
 mod menu;
 mod splash;
 mod utils;
@@ -21,6 +22,8 @@ struct GameAssets {
     bevy_logo: Handle<Image>,
     #[asset(path = "Overpass-SemiBold.ttf")]
     font: Handle<Font>,
+    #[asset(path = "player.png")]
+    player: Handle<Image>,
 }
 
 fn main() {
@@ -36,7 +39,7 @@ fn main() {
     }))
     .add_state::<GameState>()
     .init_collection::<GameAssets>()
-    .add_plugins((splash::SplashPlugin, menu::MenuPlugin))
+    .add_plugins((splash::SplashPlugin, menu::MenuPlugin, game::GamePlugin))
     .add_systems(Startup, setup);
 
     #[cfg(feature = "inspect")]
