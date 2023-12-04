@@ -79,10 +79,11 @@ fn turn_player(
         .single()
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-        .map(|ray| ray.origin)
+        .map(|ray| ray.origin.truncate())
     else {
         return;
     };
     let mut transform = player_query.single_mut();
-    transform.look_at(cursor_pos, Vec3::NEG_Z);
+    let direction = (cursor_pos - transform.translation.truncate()).normalize();
+    transform.rotation = Quat::from_rotation_arc_2d(Vec2::Y, direction);
 }
