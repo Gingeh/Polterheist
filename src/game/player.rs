@@ -1,13 +1,18 @@
+use std::collections::VecDeque;
+
 use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::Game;
+use super::{enemy::EnemyKind, spark::SparkCallbacks, Game};
 
 #[derive(Component)]
-struct Player {
+pub struct Player {
     move_speed: f32,
 }
+
+#[derive(Component, Deref, DerefMut)]
+pub struct Sparks(VecDeque<EnemyKind>);
 
 #[derive(Bundle)]
 struct PlayerBundle {
@@ -15,6 +20,7 @@ struct PlayerBundle {
     game: Game,
     #[bundle()]
     sprite: SpriteBundle,
+    sparks: Sparks,
 }
 
 pub struct PlayerPlugin;
@@ -24,7 +30,7 @@ impl Plugin for PlayerPlugin {
         app.add_systems(OnEnter(GameState::Playing), spawn_player)
             .add_systems(
                 Update,
-                (move_player, turn_player).run_if(in_state(GameState::Playing)),
+                (move_player, turn_player, handle_use).run_if(in_state(GameState::Playing)),
             );
     }
 }
@@ -41,6 +47,7 @@ fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
             },
             ..Default::default()
         },
+        sparks: Sparks(VecDeque::new()),
     });
 }
 
@@ -86,4 +93,17 @@ fn turn_player(
     let mut transform = player_query.single_mut();
     let direction = (cursor_pos - transform.translation.truncate()).normalize();
     transform.rotation = Quat::from_rotation_arc_2d(Vec2::Y, direction);
+}
+
+fn handle_use(
+    mut commands: Commands,
+    mut sparks_query: Query<&mut Sparks>,
+    spark_callbacks: Res<SparkCallbacks>,
+    mouse: Res<Input<MouseButton>>,
+) {
+    if mouse.just_pressed(MouseButton::Left) {
+        let mut sparks = sparks_query.single_mut();
+        let callback = spark_callbacks(sparks.pop_front());
+        commands.run_system(callback);
+    }
 }
