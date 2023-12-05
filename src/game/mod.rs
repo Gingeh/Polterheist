@@ -1,4 +1,7 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
+use bevy::time::common_conditions::on_timer;
 
 use crate::{utils, GameAssets, GameState};
 
@@ -26,16 +29,17 @@ impl Plugin for GamePlugin {
             projectile::ProjectilePlugin,
         ))
         .add_systems(OnExit(GameState::Playing), utils::despawn_with::<Game>)
-        .add_systems(OnEnter(GameState::Playing), spawn_test_enemies);
+        .add_systems(
+            Update,
+            spawn_enemy
+                .run_if(in_state(GameState::Playing))
+                .run_if(on_timer(Duration::from_secs(1))),
+        );
     }
 }
 
-fn spawn_test_enemies(mut commands: Commands, assets: Res<GameAssets>) {
+fn spawn_enemy(mut commands: Commands, assets: Res<GameAssets>) {
     commands
         .spawn(EnemyBundle::new(EnemyKind::Basic, &assets))
-        .insert(Transform::from_xyz(100.0, 200.0, 0.0));
-
-    commands
-        .spawn(EnemyBundle::new(EnemyKind::Basic, &assets))
-        .insert(Transform::from_xyz(-100.0, 200.0, 0.0));
+        .insert(Transform::from_xyz(450.0, 450.0, 0.0));
 }

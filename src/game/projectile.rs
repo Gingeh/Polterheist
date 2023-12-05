@@ -55,9 +55,7 @@ fn check_collisions(
 ) {
     for (projectile_transform, projectile_radius, projectile_team, projectile) in &projectile_query
     {
-        for (target_transform, target_radius, target_team, mut target_health) in
-            &mut target_query
-        {
+        for (target_transform, target_radius, target_team, mut target_health) in &mut target_query {
             if projectile_team == target_team {
                 continue; // Skip if both are on the same team
             }

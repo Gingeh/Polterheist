@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{enemy::EnemyKind, spark::SparkCallbacks, Game, projectile::Team};
+use super::{enemy::EnemyKind, projectile::Team, spark::SparkCallbacks, Game};
 
 #[derive(Component)]
 pub struct Player {

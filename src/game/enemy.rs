@@ -2,7 +2,11 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{player::Sparks, projectile::{Radius, Team}, Game, Health};
+use super::{
+    player::{Player, Sparks},
+    projectile::{Radius, Team},
+    Game, Health,
+};
 
 #[derive(Component)]
 pub struct Enemy;
@@ -10,6 +14,12 @@ pub struct Enemy;
 #[derive(Component, Clone, Copy)]
 pub enum EnemyKind {
     Basic,
+}
+
+#[derive(Component)]
+struct Behaviour {
+    homing_force: f32,
+    separating_force: f32,
 }
 
 #[derive(Bundle)]
@@ -22,6 +32,7 @@ pub struct EnemyBundle {
     team: Team,
     health: Health,
     radius: Radius,
+    behaviour: Behaviour,
 }
 
 impl EnemyBundle {
@@ -42,6 +53,10 @@ impl EnemyBundle {
                 team: Team::Hostile,
                 health: Health(1),
                 radius: Radius(20.0),
+                behaviour: Behaviour {
+                    homing_force: 100.0,
+                    separating_force: 100.0,
+                },
             },
         }
     }
@@ -51,7 +66,10 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, handle_health.run_if(in_state(GameState::Playing)));
+        app.add_systems(
+            Update,
+            (handle_health, fetch_positions.pipe(movement)).run_if(in_state(GameState::Playing)),
+        );
     }
 }
 
@@ -67,5 +85,40 @@ fn handle_health(
         }
         commands.entity(entity).despawn_recursive();
         sparks.push_back(*kind);
+    }
+}
+
+fn fetch_positions(enemy_query: Query<&Transform, With<Enemy>>) -> Vec<Vec3> {
+    enemy_query
+        .iter()
+        .map(|transform| transform.translation)
+        .collect()
+}
+
+fn movement(
+    In(other_positions): In<Vec<Vec3>>,
+    mut enemy_query: Query<(&mut Transform, &Behaviour), Without<Player>>,
+    player_query: Query<&Transform, With<Player>>,
+    time: Res<Time>,
+) {
+    let player_position = player_query.single().translation;
+    for (mut transform, behaviour) in &mut enemy_query {
+        let homing = (player_position - transform.translation).normalize();
+        let separation = other_positions
+            .iter()
+            .filter_map(|&pos| {
+                if pos == transform.translation {
+                    return None;
+                }
+                let away = transform.translation - pos;
+                let distance = away.length_squared();
+                Some(away.normalize() * distance.recip())
+            })
+            .sum::<Vec3>()
+            .clamp_length_max(behaviour.separating_force.recip());
+
+        transform.translation += (homing * behaviour.homing_force
+            + separation * behaviour.separating_force.powi(2))
+            * time.delta_seconds();
     }
 }
