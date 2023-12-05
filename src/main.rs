@@ -24,8 +24,10 @@ struct GameAssets {
     font: Handle<Font>,
     #[asset(path = "player.png")]
     player: Handle<Image>,
-    #[asset(path = "enemies/basic.png")]
+    #[asset(path = "basic-enemy.png")]
     basic_enemy: Handle<Image>,
+    #[asset(path = "bullet.png")]
+    bullet: Handle<Image>,
 }
 
 fn main() {

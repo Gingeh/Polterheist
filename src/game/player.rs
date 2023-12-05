@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{enemy::EnemyKind, spark::SparkCallbacks, Game};
+use super::{enemy::EnemyKind, spark::SparkCallbacks, Game, projectile::Team};
 
 #[derive(Component)]
 pub struct Player {
@@ -20,6 +20,7 @@ struct PlayerBundle {
     game: Game,
     #[bundle()]
     sprite: SpriteBundle,
+    team: Team,
     sparks: Sparks,
 }
 
@@ -47,6 +48,7 @@ fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
             },
             ..Default::default()
         },
+        team: Team::Friendly,
         sparks: Sparks(VecDeque::new()),
     });
 }

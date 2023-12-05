@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{player::Sparks, Game, Health};
+use super::{player::Sparks, projectile::{Radius, Team}, Game, Health};
 
 #[derive(Component)]
 pub struct Enemy;
@@ -19,7 +19,9 @@ pub struct EnemyBundle {
     kind: EnemyKind,
     #[bundle()]
     sprite: SpriteBundle,
+    team: Team,
     health: Health,
+    radius: Radius,
 }
 
 impl EnemyBundle {
@@ -37,7 +39,9 @@ impl EnemyBundle {
                     },
                     ..Default::default()
                 },
+                team: Team::Hostile,
                 health: Health(1),
+                radius: Radius(20.0),
             },
         }
     }
@@ -47,15 +51,8 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), spawn_test_enemy)
-            .add_systems(Update, handle_health.run_if(in_state(GameState::Playing)));
+        app.add_systems(Update, handle_health.run_if(in_state(GameState::Playing)));
     }
-}
-
-fn spawn_test_enemy(mut commands: Commands, assets: Res<GameAssets>) {
-    commands
-        .spawn(EnemyBundle::new(EnemyKind::Basic, &assets))
-        .insert(Transform::from_xyz(0.0, 200.0, 0.0));
 }
 
 fn handle_health(
