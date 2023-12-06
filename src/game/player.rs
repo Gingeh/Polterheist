@@ -4,7 +4,7 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{enemy::EnemyKind, projectile::Team, spark::SparkCallbacks, Game};
+use super::{enemy::EnemyKind, projectile::{Team, Radius}, spark::SparkCallbacks, Game, Health};
 
 #[derive(Component)]
 pub struct Player {
@@ -14,6 +14,12 @@ pub struct Player {
 #[derive(Component, Deref, DerefMut)]
 pub struct Sparks(VecDeque<EnemyKind>);
 
+#[derive(Component, Deref, DerefMut)]
+struct SparkCooldown(Timer);
+
+#[derive(Component, Deref, DerefMut)]
+struct HurtCooldown(Timer);
+
 #[derive(Bundle)]
 struct PlayerBundle {
     player: Player,
@@ -21,17 +27,26 @@ struct PlayerBundle {
     #[bundle()]
     sprite: SpriteBundle,
     team: Team,
+    radius: Radius,
     sparks: Sparks,
+    health: Health,
+    spark_cooldown: SparkCooldown,
+    hurt_cooldown: HurtCooldown,
 }
+
+#[derive(Event)]
+pub struct HurtPlayerEvent;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Playing), spawn_player)
+        app.add_event::<HurtPlayerEvent>()
+            .add_systems(OnEnter(GameState::Playing), spawn_player)
             .add_systems(
                 Update,
-                (move_player, turn_player, handle_use).run_if(in_state(GameState::Playing)),
+                (move_player, turn_player, handle_use, handle_hurt_events)
+                    .run_if(in_state(GameState::Playing)),
             );
     }
 }
@@ -49,7 +64,11 @@ fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
             ..Default::default()
         },
         team: Team::Friendly,
+        radius: Radius(20.0),
         sparks: Sparks(VecDeque::new()),
+        health: Health(3),
+        spark_cooldown: SparkCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
+        hurt_cooldown: HurtCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
     });
 }
 
@@ -99,13 +118,30 @@ fn turn_player(
 
 fn handle_use(
     mut commands: Commands,
-    mut sparks_query: Query<&mut Sparks>,
+    mut player_query: Query<(&mut Sparks, &mut SparkCooldown)>,
     spark_callbacks: Res<SparkCallbacks>,
     mouse: Res<Input<MouseButton>>,
+    time: Res<Time>,
 ) {
-    if mouse.just_pressed(MouseButton::Left) {
-        let mut sparks = sparks_query.single_mut();
+    let (mut sparks, mut cooldown) = player_query.single_mut();
+
+    if cooldown.tick(time.delta()).finished() && mouse.just_pressed(MouseButton::Left) {
         let callback = spark_callbacks(sparks.pop_front());
         commands.run_system(callback);
+        cooldown.reset();
+    }
+}
+
+fn handle_hurt_events(
+    mut hurt_events: EventReader<HurtPlayerEvent>,
+    mut player_query: Query<(&mut Health, &mut HurtCooldown)>,
+    time: Res<Time>,
+) {
+    let (mut health, mut cooldown) = player_query.single_mut();
+
+    if cooldown.tick(time.delta()).finished() && !hurt_events.is_empty() {
+        hurt_events.clear();
+        **health -= 1;
+        cooldown.reset();
     }
 }
