@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
-use super::{Game, Health, player::HurtPlayerEvent};
+use super::{player::HurtPlayerEvent, Game, Health};
 
 #[derive(Component)]
 pub struct Projectile;

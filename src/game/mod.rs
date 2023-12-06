@@ -1,15 +1,19 @@
-use std::time::Duration;
+use std::f32::consts::TAU;
 
 use bevy::prelude::*;
-use bevy::time::common_conditions::on_timer;
+use rand::distributions::{Distribution, Uniform};
 
 use crate::{utils, GameAssets, GameState};
 
-use self::enemy::{EnemyBundle, EnemyKind};
+use self::{
+    enemy::{EnemyBundle, EnemyKind},
+    score::Score,
+};
 
 mod enemy;
 mod player;
 mod projectile;
+mod score;
 mod spark;
 
 #[derive(Component, Deref, DerefMut)]
@@ -27,27 +31,33 @@ impl Plugin for GamePlugin {
             spark::SparkPlugin,
             enemy::EnemyPlugin,
             projectile::ProjectilePlugin,
+            score::ScorePlugin,
         ))
         .add_systems(OnExit(GameState::Playing), utils::despawn_with::<Game>)
-        .add_systems(
-            Update,
-            (
-                spawn_basic_enemy.run_if(on_timer(Duration::from_secs(1))),
-                spawn_ranged_enemy.run_if(on_timer(Duration::from_secs(5))),
-            )
-                .run_if(in_state(GameState::Playing)),
-        );
+        .add_systems(Update, spawn_enemy.run_if(in_state(GameState::Playing)));
     }
 }
 
-fn spawn_basic_enemy(mut commands: Commands, assets: Res<GameAssets>) {
-    commands
-        .spawn(EnemyBundle::new(EnemyKind::Basic, &assets))
-        .insert(Transform::from_xyz(450.0, 450.0, 0.0));
-}
+fn spawn_enemy(
+    mut commands: Commands,
+    assets: Res<GameAssets>,
+    time: Res<Time>,
+    score: Res<Score>,
+) {
+    let mut rng = rand::thread_rng();
+    let uniform = Uniform::new(0.0, 1.0);
 
-fn spawn_ranged_enemy(mut commands: Commands, assets: Res<GameAssets>) {
-    commands
-        .spawn(EnemyBundle::new(EnemyKind::Ranged, &assets))
-        .insert(Transform::from_xyz(0.0, 450.0, 0.0));
+    for (kind, per_second) in [
+        (EnemyKind::Basic, 1.0),
+        (EnemyKind::Ranged, 0.01 * score.0 as f32),
+    ] {
+        if uniform.sample(&mut rng) <= per_second * time.delta_seconds() {
+            let position =
+                Quat::from_rotation_z(uniform.sample(&mut rng) * TAU).mul_vec3(Vec3::Y * 600.0);
+
+            commands
+                .spawn(EnemyBundle::new(kind, &assets))
+                .insert(Transform::from_translation(position));
+        }
+    }
 }
