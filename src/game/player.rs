@@ -4,7 +4,12 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{enemy::EnemyKind, projectile::{Team, Radius}, spark::SparkCallbacks, Game, Health};
+use super::{
+    enemy::EnemyKind,
+    projectile::{Radius, Team},
+    spark::SparkCallbacks,
+    Game, Health,
+};
 
 #[derive(Component)]
 pub struct Player {
@@ -136,6 +141,7 @@ fn handle_hurt_events(
     mut hurt_events: EventReader<HurtPlayerEvent>,
     mut player_query: Query<(&mut Health, &mut HurtCooldown)>,
     time: Res<Time>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     let (mut health, mut cooldown) = player_query.single_mut();
 
@@ -143,5 +149,9 @@ fn handle_hurt_events(
         hurt_events.clear();
         **health -= 1;
         cooldown.reset();
+    }
+
+    if **health == 0 {
+        *next_state = NextState(Some(GameState::Menu));
     }
 }
