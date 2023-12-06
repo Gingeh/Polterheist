@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::GameState;
 
-use super::{Game, Health};
+use super::{Game, Health, player::HurtPlayerEvent};
 
 #[derive(Component)]
 pub struct Projectile;
@@ -52,6 +52,7 @@ fn check_collisions(
     mut commands: Commands,
     projectile_query: Query<(&Transform, &Radius, &Team, Entity), With<Projectile>>,
     mut target_query: Query<(&Transform, &Radius, &Team, &mut Health)>,
+    mut hurt_event_writer: EventWriter<HurtPlayerEvent>,
 ) {
     for (projectile_transform, projectile_radius, projectile_team, projectile) in &projectile_query
     {
@@ -68,7 +69,10 @@ fn check_collisions(
             }
 
             commands.entity(projectile).despawn_recursive();
-            **target_health -= 1;
+            match target_team {
+                Team::Friendly => hurt_event_writer.send(HurtPlayerEvent),
+                Team::Hostile => **target_health = target_health.saturating_sub(1),
+            }
         }
     }
 }

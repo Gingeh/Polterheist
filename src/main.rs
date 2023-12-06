@@ -26,6 +26,8 @@ struct GameAssets {
     player: Handle<Image>,
     #[asset(path = "basic-enemy.png")]
     basic_enemy: Handle<Image>,
+    #[asset(path = "ranged-enemy.png")]
+    ranged_enemy: Handle<Image>,
     #[asset(path = "bullet.png")]
     bullet: Handle<Image>,
 }

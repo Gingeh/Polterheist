@@ -31,15 +31,23 @@ impl Plugin for GamePlugin {
         .add_systems(OnExit(GameState::Playing), utils::despawn_with::<Game>)
         .add_systems(
             Update,
-            spawn_enemy
-                .run_if(in_state(GameState::Playing))
-                .run_if(on_timer(Duration::from_secs(1))),
+            (
+                spawn_basic_enemy.run_if(on_timer(Duration::from_secs(1))),
+                spawn_ranged_enemy.run_if(on_timer(Duration::from_secs(5))),
+            )
+                .run_if(in_state(GameState::Playing)),
         );
     }
 }
 
-fn spawn_enemy(mut commands: Commands, assets: Res<GameAssets>) {
+fn spawn_basic_enemy(mut commands: Commands, assets: Res<GameAssets>) {
     commands
         .spawn(EnemyBundle::new(EnemyKind::Basic, &assets))
         .insert(Transform::from_xyz(450.0, 450.0, 0.0));
+}
+
+fn spawn_ranged_enemy(mut commands: Commands, assets: Res<GameAssets>) {
+    commands
+        .spawn(EnemyBundle::new(EnemyKind::Ranged, &assets))
+        .insert(Transform::from_xyz(0.0, 450.0, 0.0));
 }

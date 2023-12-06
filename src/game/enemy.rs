@@ -5,7 +5,7 @@ use crate::{GameAssets, GameState};
 
 use super::{
     player::{HurtPlayerEvent, Player, Sparks},
-    projectile::{Radius, Team},
+    projectile::{Projectile, ProjectileBundle, Radius, Team, Velocity},
     Game, Health,
 };
 
@@ -15,6 +15,7 @@ pub struct Enemy;
 #[derive(Component, Clone, Copy)]
 pub enum EnemyKind {
     Basic,
+    Ranged,
 }
 
 #[derive(Component)]
@@ -63,6 +64,27 @@ impl EnemyBundle {
                     separating_force: 100.0,
                 },
                 attack_timer: AttackTimer(Timer::from_seconds(0.0, TimerMode::Repeating)),
+            },
+            EnemyKind::Ranged => Self {
+                enemy: Enemy,
+                game: Game,
+                kind,
+                sprite: SpriteBundle {
+                    texture: assets.ranged_enemy.clone(),
+                    sprite: Sprite {
+                        custom_size: Some(Vec2 { x: 50.0, y: 50.0 }),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                team: Team::Hostile,
+                health: Health(2),
+                radius: Radius(25.0),
+                behaviour: Behaviour {
+                    homing_force: 75.0,
+                    separating_force: 200.0,
+                },
+                attack_timer: AttackTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
             },
         }
     }
@@ -155,6 +177,7 @@ impl Command for AttackCommand {
     fn apply(self, world: &mut World) {
         match self.kind {
             EnemyKind::Basic => world.run_system_once_with(self.enemy, handle_basic_attack),
+            EnemyKind::Ranged => world.run_system_once_with(self.enemy, handle_ranged_attack),
         }
     }
 }
@@ -177,4 +200,40 @@ fn handle_basic_attack(
     {
         hurt_event_writer.send(HurtPlayerEvent);
     }
+}
+
+fn handle_ranged_attack(
+    In(enemy): In<Entity>,
+    mut commands: Commands,
+    enemy_query: Query<&Transform, With<Enemy>>,
+    player_query: Query<&Transform, With<Player>>,
+    assets: Res<GameAssets>,
+) {
+    let Ok(enemy_transform) = enemy_query.get(enemy) else {
+        return; // Enemy died before command was executed
+    };
+    let player_transform = player_query.single();
+
+    let mut projectile_transform = *enemy_transform;
+    let direction = (player_transform.translation - enemy_transform.translation)
+        .truncate()
+        .normalize();
+    projectile_transform.rotation = Quat::from_rotation_arc_2d(Vec2::Y, direction);
+
+    commands.spawn(ProjectileBundle {
+        projectile: Projectile,
+        game: Game,
+        sprite: SpriteBundle {
+            texture: assets.bullet.clone(),
+            sprite: Sprite {
+                custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
+                ..Default::default()
+            },
+            transform: projectile_transform,
+            ..Default::default()
+        },
+        velocity: Velocity(200.0),
+        team: Team::Hostile,
+        radius: Radius(15.0),
+    });
 }

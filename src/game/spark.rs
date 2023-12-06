@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 use bevy::ecs::system::SystemId;
 use bevy::prelude::*;
 
@@ -25,10 +27,12 @@ impl FromWorld for SparkCallbacks {
     fn from_world(world: &mut World) -> Self {
         let punch = world.register_system(handle_punch);
         let basic = world.register_system(handle_basic);
+        let ranged = world.register_system(handle_ranged);
 
         Self(Box::new(move |kind| match kind {
             None => punch,
             Some(EnemyKind::Basic) => basic,
+            Some(EnemyKind::Ranged) => ranged,
         }))
     }
 }
@@ -38,7 +42,7 @@ fn handle_punch(
     player_query: Query<&Transform, With<Player>>,
     mut enemy_query: Query<(&Transform, &Radius, &mut Health), With<Enemy>>,
 ) {
-    const CAST_DIST: f32 = 40.0;
+    const CAST_DIST: f32 = 80.0;
 
     let player = player_query.single();
 
@@ -76,6 +80,68 @@ fn handle_basic(
         },
         velocity: Velocity(800.0),
         team: Team::Friendly,
-        radius: Radius(2.0),
+        radius: Radius(10.0),
+    });
+}
+
+fn handle_ranged(
+    mut commands: Commands,
+    player_query: Query<&Transform, With<Player>>,
+    assets: Res<GameAssets>,
+) {
+    let mut transform = *player_query.single();
+    let angle = TAU / 32.0;
+
+    commands.spawn(ProjectileBundle {
+        projectile: Projectile,
+        game: Game,
+        sprite: SpriteBundle {
+            texture: assets.bullet.clone(),
+            sprite: Sprite {
+                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                ..Default::default()
+            },
+            transform,
+            ..Default::default()
+        },
+        velocity: Velocity(800.0),
+        team: Team::Friendly,
+        radius: Radius(10.0),
+    });
+
+    transform.rotate_local_z(-angle / 2.0);
+    commands.spawn(ProjectileBundle {
+        projectile: Projectile,
+        game: Game,
+        sprite: SpriteBundle {
+            texture: assets.bullet.clone(),
+            sprite: Sprite {
+                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                ..Default::default()
+            },
+            transform,
+            ..Default::default()
+        },
+        velocity: Velocity(800.0),
+        team: Team::Friendly,
+        radius: Radius(10.0),
+    });
+
+    transform.rotate_local_z(angle);
+    commands.spawn(ProjectileBundle {
+        projectile: Projectile,
+        game: Game,
+        sprite: SpriteBundle {
+            texture: assets.bullet.clone(),
+            sprite: Sprite {
+                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                ..Default::default()
+            },
+            transform,
+            ..Default::default()
+        },
+        velocity: Velocity(800.0),
+        team: Team::Friendly,
+        radius: Radius(10.0),
     });
 }
