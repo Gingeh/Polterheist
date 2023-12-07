@@ -8,6 +8,7 @@ bevy = "0.12"
 bevy_asset_loader = { version = "0.18" }
 bevy-inspector-egui = { version = "0.21", optional = true }
 rand = "0.8.5"
+bevy_pkv = "0.9.0"
 
 [features]
 inspect = ["dep:bevy-inspector-egui"]

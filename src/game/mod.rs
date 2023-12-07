@@ -49,7 +49,7 @@ fn spawn_enemy(
 
     for (kind, per_second) in [
         (EnemyKind::Basic, 1.0),
-        (EnemyKind::Ranged, 0.01 * score.0 as f32),
+        (EnemyKind::Ranged, 0.01 * score.score as f32),
     ] {
         if uniform.sample(&mut rng) <= per_second * time.delta_seconds() {
             let position =
