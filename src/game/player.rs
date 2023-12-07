@@ -21,7 +21,7 @@ pub struct Player {
 pub struct Sparks(pub VecDeque<EnemyKind>);
 
 #[derive(Component, Deref, DerefMut)]
-struct SparkCooldown(Timer);
+pub struct PunchCooldown(Timer);
 
 #[derive(Component, Deref, DerefMut)]
 struct HurtCooldown(Timer);
@@ -36,7 +36,7 @@ struct PlayerBundle {
     radius: Radius,
     sparks: Sparks,
     health: Health,
-    spark_cooldown: SparkCooldown,
+    punch_cooldown: PunchCooldown,
     hurt_cooldown: HurtCooldown,
 }
 
@@ -73,7 +73,7 @@ fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
         radius: Radius(20.0),
         sparks: Sparks(VecDeque::new()),
         health: Health(3),
-        spark_cooldown: SparkCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
+        punch_cooldown: PunchCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
         hurt_cooldown: HurtCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
     });
 }
@@ -124,17 +124,17 @@ fn turn_player(
 
 fn handle_use(
     mut commands: Commands,
-    mut player_query: Query<(&mut Sparks, &mut SparkCooldown)>,
+    mut player_query: Query<(&mut Sparks, &mut PunchCooldown)>,
     spark_callbacks: Res<SparkCallbacks>,
     mouse: Res<Input<MouseButton>>,
     time: Res<Time>,
 ) {
-    let (mut sparks, mut cooldown) = player_query.single_mut();
+    let (mut sparks, mut timer) = player_query.single_mut();
+    timer.tick(time.delta());
 
-    if cooldown.tick(time.delta()).finished() && mouse.just_pressed(MouseButton::Left) {
+    if mouse.just_pressed(MouseButton::Left) {
         let callback = spark_callbacks(sparks.pop_front());
         commands.run_system(callback);
-        cooldown.reset();
     }
 }
 

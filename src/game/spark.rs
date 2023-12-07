@@ -8,7 +8,7 @@ use crate::{GameAssets, GameState};
 use super::{
     enemy::{Enemy, EnemyKind},
     health::Health,
-    player::{Player, Sparks},
+    player::{Player, Sparks, PunchCooldown},
     projectile::{Projectile, ProjectileBundle, Radius, Team, Velocity},
     Game,
 };
@@ -100,12 +100,15 @@ impl FromWorld for SparkCallbacks {
 
 //TODO: Make CAST_DIST a field on Player
 fn handle_punch(
-    player_query: Query<&Transform, With<Player>>,
+    mut player_query: Query<(&Transform, &mut PunchCooldown), With<Player>>,
     mut enemy_query: Query<(&Transform, &Radius, &mut Health), With<Enemy>>,
 ) {
     const CAST_DIST: f32 = 80.0;
 
-    let player = player_query.single();
+    let (player, mut timer) = player_query.single_mut();
+
+    if !timer.finished() { return; }
+    timer.reset();
 
     for (enemy, radius, mut health) in &mut enemy_query {
         let player_to_enemy = enemy.translation - player.translation;
@@ -119,6 +122,8 @@ fn handle_punch(
             **health -= 1;
         }
     }
+
+    timer.reset();
 }
 
 fn handle_basic(
