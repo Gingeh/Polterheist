@@ -8,7 +8,7 @@ use crate::{GameAssets, GameState};
 use super::{
     enemy::{Enemy, EnemyKind},
     health::Health,
-    player::{Player, Sparks, PunchCooldown},
+    player::{Player, PunchCooldown, Sparks},
     projectile::{Projectile, ProjectileBundle, Radius, Team, Velocity},
     Game,
 };
@@ -107,7 +107,9 @@ fn handle_punch(
 
     let (player, mut timer) = player_query.single_mut();
 
-    if !timer.finished() { return; }
+    if !timer.finished() {
+        return;
+    }
     timer.reset();
 
     for (enemy, radius, mut health) in &mut enemy_query {

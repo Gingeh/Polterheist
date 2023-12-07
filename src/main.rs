@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy::window::WindowResolution;
+use bevy::{asset::AssetMetaCheck, window::WindowResolution};
 
 use bevy_asset_loader::prelude::*;
 
@@ -40,19 +40,20 @@ struct GameAssets {
 
 fn main() {
     let mut app = App::new();
-    app.add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: "Bevy Game".to_string(),
-            resolution: WindowResolution::new(800.0, 800.0),
-            resizable: false,
+    app.insert_resource(AssetMetaCheck::Never)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Bevy Game".to_string(),
+                resolution: WindowResolution::new(800.0, 800.0),
+                resizable: false,
+                ..Default::default()
+            }),
             ..Default::default()
-        }),
-        ..Default::default()
-    }))
-    .add_state::<GameState>()
-    .init_collection::<GameAssets>()
-    .add_plugins((splash::SplashPlugin, menu::MenuPlugin, game::GamePlugin))
-    .add_systems(Startup, setup);
+        }))
+        .add_state::<GameState>()
+        .init_collection::<GameAssets>()
+        .add_plugins((splash::SplashPlugin, menu::MenuPlugin, game::GamePlugin))
+        .add_systems(Startup, setup);
 
     #[cfg(feature = "inspect")]
     app.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new());
