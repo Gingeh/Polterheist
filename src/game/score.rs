@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{GameAssets, GameState};
 
-use super::{enemy::Enemy, Health};
+use super::{enemy::Enemy, health::Health};
 
 #[derive(Component)]
 struct ScoreDisplay;

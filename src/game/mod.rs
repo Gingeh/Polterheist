@@ -11,13 +11,11 @@ use self::{
 };
 
 mod enemy;
+mod health;
 mod player;
 mod projectile;
 mod score;
 mod spark;
-
-#[derive(Component, Deref, DerefMut)]
-pub struct Health(usize);
 
 #[derive(Component)]
 struct Game;
@@ -32,6 +30,7 @@ impl Plugin for GamePlugin {
             enemy::EnemyPlugin,
             projectile::ProjectilePlugin,
             score::ScorePlugin,
+            health::HealhPlugin,
         ))
         .add_systems(OnExit(GameState::Playing), utils::despawn_with::<Game>)
         .add_systems(Update, spawn_enemy.run_if(in_state(GameState::Playing)));

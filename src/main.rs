@@ -30,6 +30,8 @@ struct GameAssets {
     ranged_enemy: Handle<Image>,
     #[asset(path = "bullet.png")]
     bullet: Handle<Image>,
+    #[asset(path = "heart.png")]
+    heart: Handle<Image>,
 }
 
 fn main() {

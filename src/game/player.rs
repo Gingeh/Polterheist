@@ -6,9 +6,10 @@ use crate::{GameAssets, GameState};
 
 use super::{
     enemy::EnemyKind,
+    health::Health,
     projectile::{Radius, Team},
     spark::SparkCallbacks,
-    Game, Health,
+    Game,
 };
 
 #[derive(Component)]

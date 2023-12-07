@@ -4,9 +4,10 @@ use bevy::prelude::*;
 use crate::{GameAssets, GameState};
 
 use super::{
+    health::Health,
     player::{HurtPlayerEvent, Player, Sparks},
     projectile::{Projectile, ProjectileBundle, Radius, Team, Velocity},
-    Game, Health,
+    Game,
 };
 
 #[derive(Component)]

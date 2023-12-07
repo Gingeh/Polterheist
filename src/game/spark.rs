@@ -7,9 +7,10 @@ use crate::GameAssets;
 
 use super::{
     enemy::{Enemy, EnemyKind},
+    health::Health,
     player::Player,
     projectile::{Projectile, ProjectileBundle, Radius, Team, Velocity},
-    Game, Health,
+    Game,
 };
 
 pub struct SparkPlugin;
