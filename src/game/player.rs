@@ -18,7 +18,7 @@ pub struct Player {
 }
 
 #[derive(Component, Deref, DerefMut)]
-pub struct Sparks(VecDeque<EnemyKind>);
+pub struct Sparks(pub VecDeque<EnemyKind>);
 
 #[derive(Component, Deref, DerefMut)]
 struct SparkCooldown(Timer);
