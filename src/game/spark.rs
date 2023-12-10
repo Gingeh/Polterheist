@@ -103,7 +103,7 @@ fn handle_punch(
     mut player_query: Query<(&Transform, &mut PunchCooldown), With<Player>>,
     mut enemy_query: Query<(&Transform, &Radius, &mut Health), With<Enemy>>,
 ) {
-    const CAST_DIST: f32 = 80.0;
+    const CAST_DIST: f32 = 60.0;
 
     let (player, mut timer) = player_query.single_mut();
 
@@ -140,15 +140,15 @@ fn handle_basic(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                custom_size: Some(Vec2 { x: 15.0, y: 15.0 }),
                 ..Default::default()
             },
             transform,
             ..Default::default()
         },
-        velocity: Velocity(800.0),
+        velocity: Velocity(600.0),
         team: Team::Friendly,
-        radius: Radius(10.0),
+        radius: Radius(7.5),
     });
 }
 
@@ -166,15 +166,15 @@ fn handle_ranged(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                custom_size: Some(Vec2 { x: 15.0, y: 15.0 }),
                 ..Default::default()
             },
             transform,
             ..Default::default()
         },
-        velocity: Velocity(800.0),
+        velocity: Velocity(600.0),
         team: Team::Friendly,
-        radius: Radius(10.0),
+        radius: Radius(7.5),
     });
 
     transform.rotate_local_z(-angle / 2.0);
@@ -184,15 +184,15 @@ fn handle_ranged(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                custom_size: Some(Vec2 { x: 15.0, y: 15.0 }),
                 ..Default::default()
             },
             transform,
             ..Default::default()
         },
-        velocity: Velocity(800.0),
+        velocity: Velocity(600.0),
         team: Team::Friendly,
-        radius: Radius(10.0),
+        radius: Radius(7.5),
     });
 
     transform.rotate_local_z(angle);
@@ -202,14 +202,14 @@ fn handle_ranged(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                custom_size: Some(Vec2 { x: 15.0, y: 15.0 }),
                 ..Default::default()
             },
             transform,
             ..Default::default()
         },
-        velocity: Velocity(800.0),
+        velocity: Velocity(600.0),
         team: Team::Friendly,
-        radius: Radius(10.0),
+        radius: Radius(7.5),
     });
 }

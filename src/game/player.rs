@@ -59,18 +59,18 @@ impl Plugin for PlayerPlugin {
 
 fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn(PlayerBundle {
-        player: Player { move_speed: 400.0 },
+        player: Player { move_speed: 300.0 },
         game: Game,
         sprite: SpriteBundle {
             texture: assets.player.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 40.0, y: 40.0 }),
+                custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
                 ..Default::default()
             },
             ..Default::default()
         },
         team: Team::Friendly,
-        radius: Radius(20.0),
+        radius: Radius(15.0),
         sparks: Sparks(VecDeque::new()),
         health: Health(3),
         punch_cooldown: PunchCooldown(Timer::from_seconds(0.5, TimerMode::Once)),

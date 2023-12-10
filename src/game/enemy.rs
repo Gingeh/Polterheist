@@ -52,17 +52,17 @@ impl EnemyBundle {
                 sprite: SpriteBundle {
                     texture: assets.basic_enemy.clone(),
                     sprite: Sprite {
-                        custom_size: Some(Vec2 { x: 40.0, y: 40.0 }),
+                        custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
                         ..Default::default()
                     },
                     ..Default::default()
                 },
                 team: Team::Hostile,
                 health: Health(1),
-                radius: Radius(20.0),
+                radius: Radius(15.0),
                 behaviour: Behaviour {
-                    homing_force: 100.0,
-                    separating_force: 100.0,
+                    homing_force: 75.0,
+                    separating_force: 75.0,
                 },
                 attack_timer: AttackTimer(Timer::from_seconds(0.0, TimerMode::Repeating)),
             },
@@ -73,17 +73,17 @@ impl EnemyBundle {
                 sprite: SpriteBundle {
                     texture: assets.ranged_enemy.clone(),
                     sprite: Sprite {
-                        custom_size: Some(Vec2 { x: 50.0, y: 50.0 }),
+                        custom_size: Some(Vec2 { x: 40.0, y: 40.0 }),
                         ..Default::default()
                     },
                     ..Default::default()
                 },
                 team: Team::Hostile,
                 health: Health(2),
-                radius: Radius(25.0),
+                radius: Radius(20.0),
                 behaviour: Behaviour {
-                    homing_force: 75.0,
-                    separating_force: 200.0,
+                    homing_force: 60.0,
+                    separating_force: 150.0,
                 },
                 attack_timer: AttackTimer(Timer::from_seconds(1.0, TimerMode::Repeating)),
             },
@@ -227,14 +227,14 @@ fn handle_ranged_attack(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
+                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
                 ..Default::default()
             },
             transform: projectile_transform,
             ..Default::default()
         },
-        velocity: Velocity(200.0),
+        velocity: Velocity(150.0),
         team: Team::Hostile,
-        radius: Radius(15.0),
+        radius: Radius(10.0),
     });
 }
