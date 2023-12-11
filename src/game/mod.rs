@@ -13,6 +13,7 @@ use self::{
 mod enemy;
 mod health;
 mod player;
+mod pointer;
 mod projectile;
 pub mod score;
 mod spark;
@@ -31,6 +32,7 @@ impl Plugin for GamePlugin {
             projectile::ProjectilePlugin,
             score::ScorePlugin,
             health::HealhPlugin,
+            pointer::PointerPlugin,
         ))
         .add_systems(OnExit(GameState::Playing), utils::despawn_with::<Game>)
         .add_systems(Update, spawn_enemy.run_if(in_state(GameState::Playing)));

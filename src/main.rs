@@ -38,6 +38,8 @@ struct GameAssets {
     bullet: Handle<Image>,
     #[asset(path = "heart.png")]
     heart: Handle<Image>,
+    #[asset(path = "pointer.png")]
+    pointer: Handle<Image>,
 }
 
 fn main() {
