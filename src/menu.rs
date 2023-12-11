@@ -1,5 +1,6 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
+use bevy_nine_slice_ui::NineSliceUiTexture;
 
 use crate::{utils, GameAssets, GameState};
 
@@ -60,6 +61,7 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>) {
                         style: button_style.clone(),
                         ..Default::default()
                     },
+                    NineSliceUiTexture::from_image(assets.button_ninepatch.clone()),
                     MenuButton::Play,
                 ))
                 .with_children(|parent| {
@@ -72,6 +74,7 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>) {
                         style: button_style.clone(),
                         ..Default::default()
                     },
+                    NineSliceUiTexture::from_image(assets.button_ninepatch.clone()),
                     MenuButton::Quit,
                 ))
                 .with_children(|parent| {

@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::{asset::AssetMetaCheck, window::WindowResolution};
 
 use bevy_asset_loader::prelude::*;
+use bevy_nine_slice_ui::NineSliceUiPlugin;
 
 mod game;
 mod gameover;
@@ -58,6 +59,8 @@ struct GameAssets {
     broken_staff: Handle<Image>,
     #[asset(path = "puff.png")]
     puff: Handle<Image>,
+    #[asset(path = "button-ninepatch.png")]
+    button_ninepatch: Handle<Image>,
 }
 
 fn main() {
@@ -78,6 +81,7 @@ fn main() {
             }),
             ..Default::default()
         }))
+        .add_plugins(NineSliceUiPlugin::default())
         .add_state::<GameState>()
         .init_collection::<GameAssets>()
         .add_plugins((
