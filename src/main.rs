@@ -63,6 +63,12 @@ struct GameAssets {
 fn main() {
     let mut app = App::new();
     app.insert_resource(AssetMetaCheck::Never)
+        .insert_resource(ClearColor(Color::Rgba {
+            red: 0.298,
+            green: 0.271,
+            blue: 0.247,
+            alpha: 1.0,
+        }))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Bevy Game".to_string(),
