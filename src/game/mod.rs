@@ -14,7 +14,7 @@ mod enemy;
 mod health;
 mod player;
 mod projectile;
-mod score;
+pub mod score;
 mod spark;
 
 #[derive(Component)]

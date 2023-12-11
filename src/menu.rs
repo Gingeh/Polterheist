@@ -29,7 +29,7 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>) {
         margin: UiRect::all(Val::Px(20.0)),
         justify_content: JustifyContent::Center,
         align_items: AlignItems::Center,
-        ..default()
+        ..Default::default()
     };
 
     let text_style = TextStyle {
@@ -47,29 +47,18 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>) {
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::Center,
                     flex_direction: FlexDirection::Column,
-                    ..default()
+                    ..Default::default()
                 },
-                ..default()
+                ..Default::default()
             },
             MainMenu,
         ))
         .with_children(|parent| {
-            /*
-            parent.spawn(ImageBundle {
-                style: Style {
-                    width: Val::Auto,
-                    height: Val::Px(300.0),
-                    ..default()
-                },
-                image: UiImage::new(assets.game_logo.clone()),
-                ..default()
-            });
-            */
             parent
                 .spawn((
                     ButtonBundle {
                         style: button_style.clone(),
-                        ..default()
+                        ..Default::default()
                     },
                     MenuButton::Play,
                 ))
@@ -81,7 +70,7 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>) {
                 .spawn((
                     ButtonBundle {
                         style: button_style.clone(),
-                        ..default()
+                        ..Default::default()
                     },
                     MenuButton::Quit,
                 ))

@@ -4,6 +4,7 @@ use bevy::{asset::AssetMetaCheck, window::WindowResolution};
 use bevy_asset_loader::prelude::*;
 
 mod game;
+mod gameover;
 mod menu;
 mod splash;
 mod utils;
@@ -14,6 +15,7 @@ enum GameState {
     Splash,
     Menu,
     Playing,
+    GameOver,
 }
 
 #[derive(AssetCollection, Resource)]
@@ -52,7 +54,12 @@ fn main() {
         }))
         .add_state::<GameState>()
         .init_collection::<GameAssets>()
-        .add_plugins((splash::SplashPlugin, menu::MenuPlugin, game::GamePlugin))
+        .add_plugins((
+            splash::SplashPlugin,
+            menu::MenuPlugin,
+            game::GamePlugin,
+            gameover::GameOverPlugin,
+        ))
         .add_systems(Startup, setup);
 
     #[cfg(feature = "inspect")]

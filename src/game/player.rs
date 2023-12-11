@@ -153,6 +153,6 @@ fn handle_hurt_events(
     }
 
     if **health == 0 {
-        *next_state = NextState(Some(GameState::Menu));
+        *next_state = NextState(Some(GameState::GameOver));
     }
 }
