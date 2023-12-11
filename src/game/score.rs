@@ -36,12 +36,23 @@ fn reset_score(mut score: ResMut<Score>) {
 }
 
 fn update_score(
+    mut commands: Commands,
     mut score: ResMut<Score>,
     enemy_query: Query<Ref<Health>, (Changed<Health>, With<Enemy>)>,
+    assets: Res<GameAssets>,
 ) {
-    score.score += enemy_query.iter().filter(|x| !x.is_added()).count();
+    let hurt_enemies = enemy_query.iter().filter(|x| !x.is_added()).count();
+
+    score.score += hurt_enemies;
     if score.score > score.high_score {
         score.high_score = score.score;
+    }
+
+    if hurt_enemies != 0 {
+        commands.spawn(AudioBundle {
+            source: assets.hit_enemy.clone(),
+            ..Default::default()
+        });
     }
 }
 

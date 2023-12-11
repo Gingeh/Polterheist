@@ -40,6 +40,12 @@ struct GameAssets {
     heart: Handle<Image>,
     #[asset(path = "pointer.png")]
     pointer: Handle<Image>,
+    #[asset(path = "shoot.ogg")]
+    shoot: Handle<AudioSource>,
+    #[asset(path = "hit_enemy.ogg")]
+    hit_enemy: Handle<AudioSource>,
+    #[asset(path = "hurt.ogg")]
+    hurt: Handle<AudioSource>,
 }
 
 fn main() {

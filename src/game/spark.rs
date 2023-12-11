@@ -148,6 +148,10 @@ fn handle_basic(
         team: Team::Friendly,
         radius: Radius(7.5),
     });
+    commands.spawn(AudioBundle {
+        source: assets.shoot.clone(),
+        ..Default::default()
+    });
 }
 
 fn handle_ranged(
@@ -209,5 +213,10 @@ fn handle_ranged(
         velocity: Velocity(600.0),
         team: Team::Friendly,
         radius: Radius(7.5),
+    });
+
+    commands.spawn(AudioBundle {
+        source: assets.shoot.clone(),
+        ..Default::default()
     });
 }

@@ -139,10 +139,12 @@ fn handle_use(
 }
 
 fn handle_hurt_events(
+    mut commands: Commands,
     mut hurt_events: EventReader<HurtPlayerEvent>,
     mut player_query: Query<(&mut Health, &mut HurtCooldown)>,
     time: Res<Time>,
     mut next_state: ResMut<NextState<GameState>>,
+    assets: Res<GameAssets>,
 ) {
     let (mut health, mut cooldown) = player_query.single_mut();
 
@@ -150,6 +152,10 @@ fn handle_hurt_events(
         hurt_events.clear();
         **health -= 1;
         cooldown.reset();
+        commands.spawn(AudioBundle {
+            source: assets.hurt.clone(),
+            ..Default::default()
+        });
     }
 
     if **health == 0 {
