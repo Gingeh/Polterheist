@@ -72,6 +72,15 @@ fn setup_menu(mut commands: Commands, assets: Res<GameAssets>, score: Res<Score>
                     },
                 },
             ]));
+            parent.spawn(ImageBundle {
+                style: Style {
+                    width: Val::Percent(25.0),
+                    height: Val::Auto,
+                    ..Default::default()
+                },
+                image: UiImage::new(assets.broken_staff.clone()),
+                ..Default::default()
+            });
             parent
                 .spawn(NodeBundle {
                     style: Style {

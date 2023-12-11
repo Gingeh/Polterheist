@@ -17,6 +17,9 @@ pub struct Player {
     move_speed: f32,
 }
 
+#[derive(Component)]
+struct Wand;
+
 #[derive(Component, Deref, DerefMut)]
 pub struct Sparks(pub VecDeque<EnemyKind>);
 
@@ -51,31 +54,53 @@ impl Plugin for PlayerPlugin {
             .add_systems(OnEnter(GameState::Playing), spawn_player)
             .add_systems(
                 Update,
-                (move_player, turn_player, handle_use, handle_hurt_events)
+                (
+                    move_player,
+                    turn_player,
+                    handle_use,
+                    handle_hurt_events,
+                    show_wand,
+                )
                     .run_if(in_state(GameState::Playing)),
             );
     }
 }
 
 fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
-    commands.spawn(PlayerBundle {
-        player: Player { move_speed: 300.0 },
-        game: Game,
-        sprite: SpriteBundle {
-            texture: assets.player.clone(),
-            sprite: Sprite {
-                custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
+    commands
+        .spawn(PlayerBundle {
+            player: Player { move_speed: 300.0 },
+            game: Game,
+            sprite: SpriteBundle {
+                texture: assets.player.clone(),
+                sprite: Sprite {
+                    custom_size: Some(Vec2 { x: 38.0, y: 38.0 }),
+                    ..Default::default()
+                },
                 ..Default::default()
             },
-            ..Default::default()
-        },
-        team: Team::Friendly,
-        radius: Radius(15.0),
-        sparks: Sparks(VecDeque::new()),
-        health: Health(3),
-        punch_cooldown: PunchCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
-        hurt_cooldown: HurtCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
-    });
+            team: Team::Friendly,
+            radius: Radius(19.0),
+            sparks: Sparks(VecDeque::new()),
+            health: Health(3),
+            punch_cooldown: PunchCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
+            hurt_cooldown: HurtCooldown(Timer::from_seconds(0.5, TimerMode::Once)),
+        })
+        .with_children(|parent| {
+            parent.spawn((
+                SpriteBundle {
+                    texture: assets.wand.clone(),
+                    sprite: Sprite {
+                        custom_size: Some(Vec2 { x: 16.0, y: 39.0 }),
+                        ..Default::default()
+                    },
+                    transform: Transform::from_xyz(0.0, 29.0, 1.0),
+                    visibility: Visibility::Hidden,
+                    ..Default::default()
+                },
+                Wand,
+            ));
+        });
 }
 
 fn move_player(
@@ -160,5 +185,15 @@ fn handle_hurt_events(
 
     if **health == 0 {
         *next_state = NextState(Some(GameState::GameOver));
+    }
+}
+
+fn show_wand(mut wand_query: Query<&mut Visibility, With<Wand>>, mouse: Res<Input<MouseButton>>) {
+    let mut visibility = wand_query.single_mut();
+
+    if mouse.just_pressed(MouseButton::Left) {
+        *visibility = Visibility::Visible;
+    } else if mouse.just_released(MouseButton::Left) {
+        *visibility = Visibility::Hidden;
     }
 }

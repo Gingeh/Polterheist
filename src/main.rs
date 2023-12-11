@@ -22,18 +22,26 @@ enum GameState {
 struct GameAssets {
     #[asset(path = "bevy.png")]
     bevy_logo: Handle<Image>,
+    #[asset(path = "background.png")]
+    background: Handle<Image>,
     #[asset(path = "Overpass-SemiBold.ttf")]
     font: Handle<Font>,
     #[asset(path = "player.png")]
     player: Handle<Image>,
+    #[asset(path = "wand.png")]
+    wand: Handle<Image>,
     #[asset(path = "basic-enemy.png")]
     basic_enemy: Handle<Image>,
     #[asset(path = "ranged-enemy.png")]
     ranged_enemy: Handle<Image>,
+    #[asset(path = "punch-spark.png")]
+    punch_spark: Handle<Image>,
     #[asset(path = "basic-spark.png")]
     basic_spark: Handle<Image>,
     #[asset(path = "ranged-spark.png")]
     ranged_spark: Handle<Image>,
+    #[asset(path = "next-spark-ring.png")]
+    next_spark_ring: Handle<Image>,
     #[asset(path = "bullet.png")]
     bullet: Handle<Image>,
     #[asset(path = "heart.png")]
@@ -46,6 +54,10 @@ struct GameAssets {
     hit_enemy: Handle<AudioSource>,
     #[asset(path = "hurt.ogg")]
     hurt: Handle<AudioSource>,
+    #[asset(path = "broken-staff.png")]
+    broken_staff: Handle<Image>,
+    #[asset(path = "puff.png")]
+    puff: Handle<Image>,
 }
 
 fn main() {
@@ -76,6 +88,15 @@ fn main() {
     app.run();
 }
 
-fn setup(mut commands: Commands) {
+fn setup(mut commands: Commands, assets: Res<GameAssets>) {
     commands.spawn(Camera2dBundle::default());
+    commands.spawn(SpriteBundle {
+        texture: assets.background.clone(),
+        transform: Transform::from_translation(Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -100.0,
+        }),
+        ..Default::default()
+    });
 }

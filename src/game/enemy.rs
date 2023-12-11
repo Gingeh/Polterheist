@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::ecs::system::{Command, RunSystemOnce};
 use bevy::prelude::*;
 
@@ -52,14 +54,14 @@ impl EnemyBundle {
                 sprite: SpriteBundle {
                     texture: assets.basic_enemy.clone(),
                     sprite: Sprite {
-                        custom_size: Some(Vec2 { x: 30.0, y: 30.0 }),
+                        custom_size: Some(Vec2 { x: 39.0, y: 39.0 }),
                         ..Default::default()
                     },
                     ..Default::default()
                 },
                 team: Team::Hostile,
                 health: Health(1),
-                radius: Radius(15.0),
+                radius: Radius(19.5),
                 behaviour: Behaviour {
                     homing_force: 75.0,
                     separating_force: 75.0,
@@ -73,14 +75,14 @@ impl EnemyBundle {
                 sprite: SpriteBundle {
                     texture: assets.ranged_enemy.clone(),
                     sprite: Sprite {
-                        custom_size: Some(Vec2 { x: 40.0, y: 40.0 }),
+                        custom_size: Some(Vec2 { x: 47.0, y: 47.0 }),
                         ..Default::default()
                     },
                     ..Default::default()
                 },
                 team: Team::Hostile,
                 health: Health(2),
-                radius: Radius(20.0),
+                radius: Radius(23.5),
                 behaviour: Behaviour {
                     homing_force: 60.0,
                     separating_force: 150.0,
@@ -90,6 +92,9 @@ impl EnemyBundle {
         }
     }
 }
+
+#[derive(Component)]
+struct Puff(Timer);
 
 pub struct EnemyPlugin;
 
@@ -101,6 +106,7 @@ impl Plugin for EnemyPlugin {
                 handle_health,
                 fetch_positions.pipe(movement),
                 handle_attacks,
+                despawn_puffs,
             )
                 .run_if(in_state(GameState::Playing)),
         );
@@ -109,15 +115,29 @@ impl Plugin for EnemyPlugin {
 
 fn handle_health(
     mut commands: Commands,
-    enemy_query: Query<(Entity, &Health, &EnemyKind), Changed<Health>>,
+    enemy_query: Query<(Entity, &Health, &EnemyKind, &Transform), Changed<Health>>,
     mut player_query: Query<&mut Sparks>,
+    assets: Res<GameAssets>,
 ) {
     let mut sparks = player_query.single_mut();
-    for (entity, health, kind) in &enemy_query {
+    for (entity, health, kind, transform) in &enemy_query {
         if **health != 0 {
             continue;
         }
         commands.entity(entity).despawn_recursive();
+        commands.spawn((
+            SpriteBundle {
+                texture: assets.puff.clone(),
+                sprite: Sprite {
+                    custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                    ..Default::default()
+                },
+                transform: transform.with_rotation(Quat::IDENTITY),
+                ..Default::default()
+            },
+            Puff(Timer::new(Duration::from_millis(500), TimerMode::Once)),
+            Game,
+        ));
         sparks.push_back(*kind);
     }
 }
@@ -154,6 +174,8 @@ fn movement(
         transform.translation += (homing * behaviour.homing_force
             + separation * behaviour.separating_force.powi(2))
             * time.delta_seconds();
+
+        transform.rotation = Quat::from_rotation_arc(Vec3::Y, homing);
     }
 }
 
@@ -227,7 +249,7 @@ fn handle_ranged_attack(
         sprite: SpriteBundle {
             texture: assets.bullet.clone(),
             sprite: Sprite {
-                custom_size: Some(Vec2 { x: 20.0, y: 20.0 }),
+                custom_size: Some(Vec2 { x: 25.0, y: 25.0 }),
                 ..Default::default()
             },
             transform: projectile_transform,
@@ -235,6 +257,18 @@ fn handle_ranged_attack(
         },
         velocity: Velocity(150.0),
         team: Team::Hostile,
-        radius: Radius(10.0),
+        radius: Radius(12.5),
     });
+}
+
+fn despawn_puffs(
+    mut commands: Commands,
+    mut puff_query: Query<(Entity, &mut Puff)>,
+    time: Res<Time>,
+) {
+    for (puff, mut timer) in &mut puff_query {
+        if timer.0.tick(time.delta()).finished() {
+            commands.entity(puff).despawn_recursive();
+        }
+    }
 }
