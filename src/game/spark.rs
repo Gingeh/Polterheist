@@ -110,7 +110,6 @@ fn handle_punch(
     if !timer.finished() {
         return;
     }
-    timer.reset();
 
     for (enemy, radius, mut health) in &mut enemy_query {
         let player_to_enemy = enemy.translation - player.translation;
