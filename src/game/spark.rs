@@ -121,10 +121,9 @@ fn handle_punch(
             || player_to_enemy.length_squared() <= radius.powi(2)
         {
             **health -= 1;
+            timer.reset();
         }
     }
-
-    timer.reset();
 }
 
 fn handle_basic(
