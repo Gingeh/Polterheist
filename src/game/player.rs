@@ -14,7 +14,8 @@ use super::{
 
 #[derive(Component)]
 pub struct Player {
-    move_speed: f32,
+    pub move_speed: f32,
+    pub punch_distance: f32,
 }
 
 #[derive(Component)]
@@ -69,7 +70,10 @@ impl Plugin for PlayerPlugin {
 fn spawn_player(mut commands: Commands, assets: Res<GameAssets>) {
     commands
         .spawn(PlayerBundle {
-            player: Player { move_speed: 300.0 },
+            player: Player {
+                move_speed: 300.0,
+                punch_distance: 40.0,
+            },
             game: Game,
             sprite: SpriteBundle {
                 texture: assets.player.clone(),

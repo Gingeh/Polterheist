@@ -129,14 +129,12 @@ impl FromWorld for SparkCallbacks {
     }
 }
 
-//TODO: Make CAST_DIST a field on Player
 fn handle_punch(
-    mut player_query: Query<(&Transform, &mut PunchCooldown), With<Player>>,
+    mut player_query: Query<(&Transform, &mut PunchCooldown, &Player)>,
     mut enemy_query: Query<(&Transform, &Radius, &mut Health), With<Enemy>>,
 ) {
-    const CAST_DIST: f32 = 60.0;
-
-    let (player, mut timer) = player_query.single_mut();
+    let (player, mut timer, player_settings) = player_query.single_mut();
+    let cast_dist = player_settings.punch_distance;
 
     if !timer.finished() {
         return;
@@ -145,10 +143,10 @@ fn handle_punch(
     for (enemy, radius, mut health) in &mut enemy_query {
         let player_to_enemy = enemy.translation - player.translation;
         let closest_point = player_to_enemy.dot(player.local_y());
-        if ((0.0..=CAST_DIST).contains(&closest_point)
+        if ((0.0..=cast_dist).contains(&closest_point)
             && (player.local_y() * closest_point).distance_squared(player_to_enemy)
                 <= radius.powi(2))
-            || (player.local_y() * CAST_DIST).distance_squared(player_to_enemy) <= radius.powi(2)
+            || (player.local_y() * cast_dist).distance_squared(player_to_enemy) <= radius.powi(2)
             || player_to_enemy.length_squared() <= radius.powi(2)
         {
             **health -= 1;
